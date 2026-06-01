@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetShield - Módulo 1</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .learning-container { max-width: 880px; margin: 0 auto; background: #ffffff; padding: 2.5rem; border-radius: 20px; border: 1px solid var(--border-color); }
+        .theory-block { line-height: 1.75; color: #1e293b; font-size: 1.05rem; margin-bottom: 2.5rem; }
+        .theory-block h2 { font-size: 2rem; margin-bottom: 1rem; color: var(--primary-blue); }
+        .section-card { background: #f8fafc; border-radius: 18px; padding: 1.75rem; border: 1px solid rgba(148,163,184,0.16); margin-bottom: 2rem; }
+        .section-card h3 { margin-top: 0; margin-bottom: 0.75rem; }
+        .analogy-box { background: #eef6ff; border-left: 4px solid var(--primary-blue); padding: 1.25rem; border-radius: 0 12px 12px 0; margin: 1.5rem 0; font-style: italic; }
+        .simulator-area { background: #ffffff; border: 1px dashed var(--border-color); padding: 2rem; border-radius: 18px; margin-bottom: 2rem; }
+        .fake-cookie-banner { background: #ffffff; border-radius: 16px; padding: 1.4rem; box-shadow: 0 14px 35px rgba(15,23,42,0.08); max-width: 520px; margin: 0 auto; text-align: left; border: 1px solid #e2e8f0; }
+        .fake-cookie-banner h4 { font-size: 1.1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px; }
+        .fake-cookie-banner p { font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 1rem; }
+        .banner-actions { display: flex; flex-direction: column; gap: 10px; }
+        .btn-accept-all { background: #22c55e; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; }
+        .btn-configure { background: transparent; color: #475569; border: none; font-size: 0.95rem; text-decoration: underline; cursor: pointer; }
+        .module-visual { width: 100%; border-radius: 24px; object-fit: cover; box-shadow: 0 24px 50px rgba(15,23,42,0.12); margin-bottom: 2rem; }
+        .exercise-suggestions { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: 12px; }
+        .exercise-suggestions li { background: #eef6ff; border-radius: 14px; padding: 14px 16px; color: #1e293b; }
+        .sim-feedback { margin-top: 1.5rem; padding: 1.1rem 1.2rem; border-radius: 12px; font-weight: 600; font-size: 0.95rem; }
+        .quiz-section { border-top: 2px solid rgba(148,163,184,0.25); padding-top: 2rem; }
+        .question-card { margin-bottom: 2rem; }
+        .question-card p { font-weight: 700; margin-bottom: 1rem; }
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-label { background: #f1f5f9; border: 1px solid rgba(148,163,184,0.35); padding: 14px 16px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; transition: background 0.2s; }
+        .option-label:hover { background: #e2e8f0; }
+        .option-label.selected-option { border-color: #2563eb; background: #eff6ff; }
+        .option-label input { display: none; }
+        .option-correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; }
+        .option-wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            <span>NetShield</span>
+        </div>
+        <div class="user-profile-box">
+            <img src="{{ url_for('static', filename='images/avatares/' ~ avatar) }}" alt="Avatar" class="profile-avatar">
+            <p class="profile-name">@{{ username }}</p>
+            <span class="badge-rango">Módulo 1</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="/dashboard" class="menu-item"><span class="material-symbols-outlined">space_dashboard</span> Dashboard</a>
+            <a href="/logout" class="menu-item btn-logout"><span class="material-symbols-outlined">logout</span> Salir</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="learning-container">
+            <section class="theory-block">
+                <h2>Módulo 1: El Rastro de las Cookies 🍪</h2>
+                <p>Las cookies son pequeños fragmentos de texto que los sitios web guardan en tu navegador. Algunas ayudan a mantener tu sesión o recordar tus preferencias, pero otras son usadas para rastrear tu comportamiento en línea mientras navegas por sitios diferentes.</p>
+                <p>En este módulo aprenderás a distinguir entre cookies esenciales, cookies de rendimiento y cookies de terceros que recopilan datos para publicidad y seguimiento.</p>
+                <p>Las cookies esenciales son necesarias para que un sitio funcione correctamente. Las cookies de rendimiento recopilan datos anónimos sobre el uso del sitio, mientras que las cookies de terceros pueden compartir tu actividad con redes publicitarias y empresas externas.</p>
+                <p>También verás cómo identificar banners engañosos que buscan que aceptes más datos de los necesarios y cómo configurar tu navegador para mantener un mejor control de tu privacidad.</p>
+                <div class="analogy-box">💡 <strong>Analogía:</strong> Es como si te pusieran una etiqueta invisible en la ropa que dijera lo que te gusta. Cada tienda que visitas la lee y te muestra anuncios personalizados, incluso sin tu consentimiento.</div>
+                <button id="mark-theory" class="btn-secondary" style="margin-bottom:1.25rem;">Marcar teoría como leída</button>
+                <img class="module-visual" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80" alt="Cookies y privacidad" loading="lazy">
+                <button id="mark-visual" class="btn-secondary" style="margin-top:1rem;">Marcar visual como vista</button>
+            </section>
+
+            <section class="section-card">
+                <h3>Ejercicio interactivo: selecciona solo cookies esenciales</h3>
+                <p class="muted">Configura el banner para permitir solo lo necesario y rechazar el seguimiento publicitario.</p>
+                <div class="cookie-options" style="display:grid; gap:12px; margin-top:14px;">
+                    <label class="list-item"><input type="checkbox" id="cookie-essential" checked disabled><span>Esenciales</span></label>
+                    <label class="list-item"><input type="checkbox" id="cookie-analytics"><span>Analíticas</span></label>
+                    <label class="list-item"><input type="checkbox" id="cookie-marketing"><span>Marketing y redes</span></label>
+                </div>
+                <button class="btn-secondary" onclick="applyCookiePreferences()" style="margin-top:1rem;">Guardar preferencias seguras</button>
+                <div id="cookie-preference-feedback" class="sim-feedback hidden"></div>
+            </section>
+
+            <section class="section-card">
+                <h3>Contenido interactivo</h3>
+                <p class="muted">Identifica el patrón oscuro del banner antes de tomar una decisión.</p>
+                <div class="simulator-area">
+                    <div class="fake-cookie-banner">
+                        <h4>🍪 Control de privacidad</h4>
+                        <p>Usamos cookies propias y de terceros para personalizar anuncios, mejorar tu experiencia y compartir tu actividad con socios publicitarios.</p>
+                        <div class="banner-actions">
+                            <button class="btn-accept-all" onclick="resolveSimulator('accept')">ACEPTAR TODO</button>
+                            <button class="btn-configure" onclick="resolveSimulator('reject')">CONFIGURAR OPCIONES</button>
+                        </div>
+                    </div>
+                    <div id="sim-feedback-box" class="sim-feedback hidden"></div>
+                </div>
+            </section>
+
+            <section class="section-card">
+                <h3>Tu progreso en este módulo</h3>
+                <div class="list-block" id="exercise-checklist"></div>
+                <div class="list-block" id="test-checklist"></div>
+                <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button id="mark-all" class="btn-primary" disabled title="Progreso automático">Progreso automático</button>
+                    <a href="/dashboard" class="btn-secondary">Volver al dashboard</a>
+                </div>
+            </section>
+
+            <section class="quiz-section">
+                <h3>🧠 Prueba de comprensión</h3>
+                <p class="muted">Selecciona las respuestas correctas y valida tu prueba. Tienes 2 oportunidades.</p>
+
+                <div class="question-card" id="q1">
+                    <p>1. ¿Qué tipo de cookie se usa para mantener tu sesión iniciada?</p>
+                    <div class="options-list">
+                        <label class="option-label" data-question="q1" data-option="a1" onclick="selectQuizOption(this, 'q1', 'a1')"><input type="radio" name="p1"> Cookie de terceros.</label>
+                        <label class="option-label" data-question="q1" data-option="a2" onclick="selectQuizOption(this, 'q1', 'a2')"><input type="radio" name="p1"> Cookie esencial de sesión.</label>
+                        <label class="option-label" data-question="q1" data-option="a3" onclick="selectQuizOption(this, 'q1', 'a3')"><input type="radio" name="p1"> Cookie publicitaria.</label>
+                    </div>
+                </div>
+
+                <div class="question-card" id="q2">
+                    <p>2. ¿Cuál es el principal problema de las cookies de terceros?</p>
+                    <div class="options-list">
+                        <label class="option-label" data-question="q2" data-option="a1" onclick="selectQuizOption(this, 'q2', 'a1')"><input type="radio" name="p2"> Ayudan a mejorar tu experiencia de compra.</label>
+                        <label class="option-label" data-question="q2" data-option="a2" onclick="selectQuizOption(this, 'q2', 'a2')"><input type="radio" name="p2"> Guardan tu contraseña de inicio de sesión.</label>
+                        <label class="option-label" data-question="q2" data-option="a3" onclick="selectQuizOption(this, 'q2', 'a3')"><input type="radio" name="p2"> Comparten tu comportamiento con empresas externas.</label>
+                    </div>
+                </div>
+
+                <div class="question-card" id="q3">
+                    <p>3. ¿Por qué es importante leer las opciones del banner en vez de aceptar todo?</p>
+                    <div class="options-list">
+                        <label class="option-label" data-question="q3" data-option="a1" onclick="selectQuizOption(this, 'q3', 'a1')"><input type="radio" name="p3"> Porque así puedes bloquear cookies de seguimiento innecesarias.</label>
+                        <label class="option-label" data-question="q3" data-option="a2" onclick="selectQuizOption(this, 'q3', 'a2')"><input type="radio" name="p3"> Porque las cookies siempre son malas.</label>
+                        <label class="option-label" data-question="q3" data-option="a3" onclick="selectQuizOption(this, 'q3', 'a3')"><input type="radio" name="p3"> Porque el sitio deja de funcionar si no aceptas todo.</label>
+                    </div>
+                </div>
+
+                <div class="question-card" id="q4">
+                    <p>4. ¿Qué debes hacer si un sitio no ofrece una opción clara para rechazar cookies?</p>
+                    <div class="options-list">
+                        <label class="option-label" data-question="q4" data-option="a1" onclick="selectQuizOption(this, 'q4', 'a1')"><input type="radio" name="p4"> Usar las opciones del navegador para bloquear cookies de terceros.</label>
+                        <label class="option-label" data-question="q4" data-option="a2" onclick="selectQuizOption(this, 'q4', 'a2')"><input type="radio" name="p4"> Aceptar todas las cookies igualmente.</label>
+                        <label class="option-label" data-question="q4" data-option="a3" onclick="selectQuizOption(this, 'q4', 'a3')"><input type="radio" name="p4"> Cambiar de dispositivo y volver más tarde.</label>
+                    </div>
+                </div>
+
+                <div class="question-card" id="q5">
+                    <p>5. ¿Qué hace un banner de cookies bien diseñado?</p>
+                    <div class="options-list">
+                        <label class="option-label" data-question="q5" data-option="a1" onclick="selectQuizOption(this, 'q5', 'a1')"><input type="radio" name="p5"> Ofrece elegir solo cookies esenciales y permite rechazar el resto.</label>
+                        <label class="option-label" data-question="q5" data-option="a2" onclick="selectQuizOption(this, 'q5', 'a2')"><input type="radio" name="p5"> Oculta el botón de rechazar para obligarte a aceptar.</label>
+                        <label class="option-label" data-question="q5" data-option="a3" onclick="selectQuizOption(this, 'q5', 'a3')"><input type="radio" name="p5"> Muestra anuncios antes de permitir el acceso.</label>
+                    </div>
+                </div>
+
+                <div style="margin-top:18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <button id="validate-quiz" class="btn-primary">Validar respuestas</button>
+                    <button id="restart-module" class="btn-secondary" onclick="resetModule()" style="display:none;">Reiniciar módulo</button>
+                    <span id="attempts-info" class="muted">Intentos restantes: 2</span>
+                </div>
+                <div id="quiz-feedback" class="sim-feedback hidden"></div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const MODULE_ID = 'm1';
+        const EXERCISES = [
+            'Leer el material de aprendizaje del módulo',
+            'Completar el simulador del banner de cookies',
+            'Ver el ejemplo visual de cookies',
+            'Guardar solo cookies esenciales'
+        ];
+        const TESTS = ['Quiz de comprensión'];
+        const MAX_ATTEMPTS = 2;
+        const QUIZ_CORRECT = { q1: 'a2', q2: 'a3', q3: 'a1', q4: 'a1', q5: 'a1' };
+
+        function loadProgress() {
+            try { return JSON.parse(localStorage.getItem('netshield_progress') || '{}'); } catch (e) { return {}; }
+        }
+
+        function saveProgress(data) {
+            localStorage.setItem('netshield_progress', JSON.stringify(data));
+        }
+
+        function ensure(state) {
+            if (!state[MODULE_ID]) {
+                state[MODULE_ID] = { exercises: EXERCISES.map(() => false), tests: TESTS.map(() => false), answers: {}, attemptsRemaining: MAX_ATTEMPTS };
+            }
+            if (typeof state[MODULE_ID].attemptsRemaining !== 'number') {
+                state[MODULE_ID].attemptsRemaining = MAX_ATTEMPTS;
+            }
+            if (!state[MODULE_ID].answers) {
+                state[MODULE_ID].answers = {};
+            }
+        }
+
+        function getState() {
+            const state = loadProgress();
+            ensure(state);
+            return state;
+        }
+
+        function renderChecklist() {
+            const state = getState();
+            const exerciseList = document.getElementById('exercise-checklist');
+            const testList = document.getElementById('test-checklist');
+            exerciseList.innerHTML = '';
+            testList.innerHTML = '';
+
+            EXERCISES.forEach((text, index) => {
+                const done = state[MODULE_ID].exercises[index];
+                const label = document.createElement('label');
+                label.className = 'list-item';
+                label.innerHTML = `<input type="checkbox" ${done ? 'checked' : ''} disabled><span>${text}</span>`;
+                exerciseList.appendChild(label);
+            });
+
+            const testDone = state[MODULE_ID].tests[0];
+            const label = document.createElement('label');
+            label.className = 'list-item';
+            label.innerHTML = `<input type="checkbox" ${testDone ? 'checked' : ''} disabled><span>${TESTS[0]}</span>`;
+            testList.appendChild(label);
+            updateQuizUI();
+        }
+
+        function updateQuizUI() {
+            const state = getState();
+            document.querySelectorAll('.option-label').forEach(label => {
+                const questionId = label.dataset.question;
+                const optionId = label.dataset.option;
+                label.classList.toggle('selected-option', state[MODULE_ID].answers[questionId] === optionId);
+            });
+
+            const info = document.getElementById('attempts-info');
+            const button = document.getElementById('validate-quiz');
+            const restartButton = document.getElementById('restart-module');
+            if (state[MODULE_ID].tests[0]) {
+                info.innerText = 'Prueba completada ✅';
+                button.disabled = true;
+                if (restartButton) restartButton.style.display = 'none';
+            } else {
+                info.innerText = `Intentos restantes: ${state[MODULE_ID].attemptsRemaining}`;
+                button.disabled = state[MODULE_ID].attemptsRemaining <= 0;
+                if (restartButton) {
+                    restartButton.style.display = state[MODULE_ID].attemptsRemaining <= 0 ? 'inline-flex' : 'none';
+                }
+            }
+        }
+
+        function selectQuizOption(element, questionId, optionId) {
+            const state = getState();
+            state[MODULE_ID].answers[questionId] = optionId;
+            saveProgress(state);
+            document.querySelectorAll(`[data-question="${questionId}"]`).forEach(label => label.classList.remove('selected-option'));
+            element.classList.add('selected-option');
+        }
+
+        function showQuizFeedback(message, background, color) {
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+            feedback.innerText = message;
+            feedback.style.background = background;
+            feedback.style.color = color;
+        }
+
+        function validateQuiz() {
+            const state = getState();
+            if (state[MODULE_ID].tests[0]) return;
+
+            const answers = state[MODULE_ID].answers || {};
+            const allAnswered = Object.keys(QUIZ_CORRECT).every(q => answers[q]);
+            if (!allAnswered) {
+                showQuizFeedback('Debes responder todas las preguntas antes de validar.', '#fde68a', '#92400e');
+                return;
+            }
+
+            const wrong = Object.keys(QUIZ_CORRECT).filter(q => answers[q] !== QUIZ_CORRECT[q]);
+            if (wrong.length === 0) {
+                state[MODULE_ID].tests[0] = true;
+                saveProgress(state);
+                showQuizFeedback('✅ Todas las respuestas son correctas. Prueba completada.', '#dcfce7', '#15803d');
+            } else {
+                state[MODULE_ID].attemptsRemaining = Math.max(0, state[MODULE_ID].attemptsRemaining - 1);
+                saveProgress(state);
+                if (state[MODULE_ID].attemptsRemaining > 0) {
+                    showQuizFeedback(`⚠️ Algunas respuestas son incorrectas. Te quedan ${state[MODULE_ID].attemptsRemaining} intentos.`, '#fee2e2', '#b91c1c');
+                } else {
+                    showQuizFeedback('❌ No quedan intentos. Usa el botón Reiniciar módulo para volver a intentarlo.', '#fee2e2', '#b91c1c');
+                }
+            }
+            updateQuizUI();
+        }
+
+        function resetModule() {
+            const state = getState();
+            state[MODULE_ID].attemptsRemaining = MAX_ATTEMPTS;
+            state[MODULE_ID].answers = {};
+            state[MODULE_ID].tests[0] = false;
+            state[MODULE_ID].exercises = EXERCISES.map(() => false);
+            saveProgress(state);
+            document.querySelectorAll('.option-label').forEach(label => label.classList.remove('selected-option', 'option-correct', 'option-wrong'));
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            renderChecklist();
+            updateQuizUI();
+        }
+
+        function resolveSimulator(action) {
+            const feedback = document.getElementById('sim-feedback-box');
+            const state = getState();
+            state[MODULE_ID].exercises[1] = true;
+            saveProgress(state);
+            renderChecklist();
+            feedback.classList.remove('hidden');
+            if (action === 'accept') {
+                feedback.innerText = '❌ Elegir aceptar todo entrega tu información a redes publicitarias y reduce tu control de tu información.';
+                feedback.style.background = '#fee2e2';
+                feedback.style.color = '#b91c1c';
+            } else {
+                feedback.innerText = '✅ Excelente. Configurar manualmente reduce el rastreo y mejora el control de tu información.';
+                feedback.style.background = '#dcfce7';
+                feedback.style.color = '#15803d';
+            }
+        }
+
+        function markTheoryRead() {
+            const state = getState();
+            state[MODULE_ID].exercises[0] = true;
+            saveProgress(state);
+            renderChecklist();
+        }
+
+        function markVisualSeen() {
+            const state = getState();
+            state[MODULE_ID].exercises[2] = true;
+            saveProgress(state);
+            renderChecklist();
+        }
+
+        function applyCookiePreferences() {
+            const analytics = document.getElementById('cookie-analytics').checked;
+            const marketing = document.getElementById('cookie-marketing').checked;
+            const feedback = document.getElementById('cookie-preference-feedback');
+            const state = getState();
+            if (!analytics && !marketing) {
+                feedback.classList.remove('hidden');
+                feedback.innerText = '✅ Buena elección. Solo cookies esenciales activas.';
+                feedback.style.background = '#dcfce7';
+                feedback.style.color = '#15803d';
+                state[MODULE_ID].exercises[3] = true;
+            } else {
+                feedback.classList.remove('hidden');
+                feedback.innerText = '⚠️ Aún hay cookies no esenciales activadas. Ajusta para mayor privacidad.';
+                feedback.style.background = '#fee2e2';
+                feedback.style.color = '#b91c1c';
+                state[MODULE_ID].exercises[3] = false;
+            }
+            saveProgress(state);
+            renderChecklist();
+        }
+
+        function markContentReviewed() {
+            const state = getState();
+            state[MODULE_ID].exercises[3] = true;
+            saveProgress(state);
+            renderChecklist();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('validate-quiz').addEventListener('click', validateQuiz);
+            document.getElementById('mark-theory').addEventListener('click', markTheoryRead);
+            document.getElementById('mark-visual').addEventListener('click', markVisualSeen);
+            renderChecklist();
+        });
+    </script>
+</body>
+</html>

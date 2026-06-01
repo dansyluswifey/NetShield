@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetShield - Acceso</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="app-card">
+        <div class="brand-side">
+            <div class="brand-logo-container">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo NetShield" class="brand-logo-img">
+            </div>
+            <div class="brand-content">
+                <h2>NetShield</h2>
+                <p class="brand-slogan">Educación interactiva para desarrollar competencias en privacidad digital y seguridad en internet.</p>
+            </div>
+            <div class="brand-highlight">
+                <span>Protege tu identidad en línea con confianza.</span>
+            </div>
+            <div class="brand-footer">
+                <span>Cómputo Educativo • 2026</span>
+            </div>
+        </div>
+
+        <div class="form-side">
+            <div class="form-panel">
+                <div id="login-box" class="auth-card {% if vista_actual != 'login' %}hidden{% endif %}">
+                    <div class="auth-header">
+                        <span class="auth-badge">Acceso seguro</span>
+                        <h3>Iniciar sesión</h3>
+                    </div>
+                    <p class="subtitle">Introduce tus credenciales para continuar.</p>
+
+                    <form action="/login" method="POST">
+                        <div class="input-block">
+                            <label>Email</label>
+                            <input type="email" name="email" required placeholder="tu@correo.com">
+                        </div>
+                        <div class="input-block">
+                            <label>Contraseña</label>
+                            <input type="password" name="password" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn-primary">Acceder</button>
+                    </form>
+                    <p class="switch-text">¿No tienes cuenta? <a href="#" onclick="toggleAuth('register')">Regístrate</a></p>
+                </div>
+
+                <div id="register-box" class="auth-card {% if vista_actual != 'register' %}hidden{% endif %}">
+                    <div class="auth-header">
+                        <span class="auth-badge">Nuevo perfil</span>
+                        <h3>Crear cuenta</h3>
+                    </div>
+                    <p class="subtitle">Regístrate con tu email para proteger tu aprendizaje.</p>
+
+                    <form action="/register" method="POST">
+                        <div class="input-block">
+                            <label>Nombre de usuario</label>
+                            <input type="text" name="username" required placeholder="Ej. cyber_dan">
+                        </div>
+                        <div class="input-block">
+                            <label>Email</label>
+                            <input type="email" name="email" required placeholder="tu@correo.com">
+                        </div>
+                        <div class="input-block">
+                            <label>Contraseña</label>
+                            <input type="password" name="password" required placeholder="Mínimo 8 caracteres">
+                        </div>
+
+                        <div class="avatar-dropdown-section">
+                            <button type="button" class="btn-secondary" onclick="toggleAvatarMenu()">Selecciona tu avatar 👾</button>
+                            <div id="avatar-menu" class="avatar-menu-container hidden">
+                                <div class="avatar-circle-grid">
+                                    {% for i in range(1, 11) %}
+                                    <label class="avatar-item">
+                                        <input type="radio" name="avatar" value="avatar{{ i }}.png" {% if i == 1 %}checked{% endif %}>
+                                        <img src="{{ url_for('static', filename='images/avatares/avatar' ~ i ~ '.png') }}" alt="Avatar {{ i }}">
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Crear cuenta</button>
+                    </form>
+                    <p class="switch-text">¿Ya tienes cuenta? <a href="#" onclick="toggleAuth('login')">Inicia sesión</a></p>
+                </div>
+
+                <div id="verify-box" class="auth-card {% if vista_actual != 'verify' %}hidden{% endif %}">
+                    <div class="auth-header">
+                        <span class="auth-badge">Código seguro</span>
+                        <h3>Verificar correo</h3>
+                    </div>
+                    <p class="subtitle">Introduce el código de 6 dígitos enviado a tu correo.</p>
+
+                    <form action="/verify" method="POST">
+                        <div class="input-block">
+                            <label>Código de seguridad</label>
+                            <input type="text" name="code" required placeholder="123456" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
+                        </div>
+                        <button type="submit" class="btn-primary">Verificar cuenta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAuth(view) {
+            document.getElementById('login-box').classList.add('hidden');
+            document.getElementById('register-box').classList.add('hidden');
+            document.getElementById('verify-box').classList.add('hidden');
+            
+            if (view === 'register') {
+                document.getElementById('register-box').classList.remove('hidden');
+            } else if (view === 'login') {
+                document.getElementById('login-box').classList.remove('hidden');
+            }
+        }
+
+        function toggleAvatarMenu() {
+            document.getElementById('avatar-menu').classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

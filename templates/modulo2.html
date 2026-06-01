@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Módulo 2 - Llaves Fuertes & 2FA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .learning-container { max-width: 900px; margin: 0 auto; padding: 32px; }
+        .section-card { background: #ffffff; border: 1px solid rgba(148,163,184,0.16); border-radius: 18px; padding: 24px; margin-bottom: 24px; }
+        .section-card h2, .section-card h3 { margin-top: 0; }
+        .interactive-box { display:flex; flex-direction:column; gap:14px; margin-top:16px; }
+        .strength-meter { height: 14px; border-radius: 999px; background: #e2e8f0; overflow:hidden; margin-top:8px; }
+        .strength-fill { height:100%; background: linear-gradient(90deg,#f97316,#22c55e); width:0%; transition: width 0.2s ease; }
+        .privacy-tip { font-size:0.95rem; color:#475569; }
+        .module-visual { width:100%; border-radius:20px; object-fit:cover; box-shadow:0 20px 45px rgba(15,23,42,0.12); margin-top:18px; }
+        .exercise-suggestions { list-style:none; margin:1rem 0 0; padding:0; display:grid; gap:12px; }
+        .exercise-suggestions li { background:#eef6ff; border-radius:14px; padding:14px 16px; color:#1e293b; }
+        .quiz-section { border-top: 2px solid rgba(148,163,184,0.25); padding-top: 2rem; }
+        .question-card { margin-bottom: 2rem; }
+        .question-card p { font-weight: 700; margin-bottom: 1rem; }
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-label { background: #f1f5f9; border: 1px solid rgba(148,163,184,0.35); padding: 14px 16px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; transition: background 0.2s; }
+        .option-label:hover { background: #e2e8f0; }
+        .option-label.selected-option { border-color: #2563eb; background: #eff6ff; }
+        .option-label input { display: none; }
+        .btn-selected { background: #2563eb !important; color: white !important; }
+        .option-correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; }
+        .option-wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+    </style>
+</head>
+<body>
+    <main class="learning-container">
+        <a href="/dashboard" class="btn-secondary" style="margin-bottom:16px; display:inline-block">← Volver al Dashboard</a>
+        <div class="section-card">
+            <h2>Módulo 2: Llaves Fuertes & 2FA</h2>
+            <p>Las contraseñas son la primera línea de defensa de tus cuentas. No todas las llaves son iguales: una clave corta o fácil de adivinar se rompe rápidamente, mientras que una clave con buena entropía puede resistir ataques de fuerza bruta.</p>
+            <p>Además, la autenticación de dos factores (2FA) agrega una segunda capa de seguridad: incluso si alguien obtiene tu contraseña, no podrá ingresar sin el segundo factor.</p>
+            <p>Existen varias formas de 2FA: códigos enviados por SMS, aplicaciones de autenticación y llaves físicas. Cuanto más diverso y difícil de imitar sea el segundo factor, más segura será tu cuenta.</p>
+            <p>También aprenderás por qué un administrador de contraseñas ayuda a crear claves largas y únicas para cada servicio, evitando que un solo robo comprometa todas tus cuentas.</p>
+            <button id="mark-theory" class="btn-secondary" style="margin-top:1rem;">Marcar teoría como leída</button>
+        </div>
+
+        <div class="section-card">
+            <h3>Interactivo: Calcula la fuerza de tu contraseña</h3>
+            <p class="privacy-tip">Escribe una contraseña y observa la estimación de su fortaleza. Las mejores contraseñas combinan longitud, símbolos, mayúsculas y números.</p>
+        <img class="module-visual" src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=900&q=80" alt="Contraseña segura" loading="lazy">
+            <div class="interactive-box">
+                <input id="password-input" type="password" placeholder="Escribe una contraseña segura" style="padding:14px 16px; border-radius:14px; border:1px solid rgba(148,163,184,0.5); width:100%;" oninput="updateStrength()">
+                <button class="btn-secondary" onclick="generatePassword()">Generar contraseña segura</button>
+                <div class="strength-meter"><div id="strength-fill" class="strength-fill"></div></div>
+                <div id="strength-label" class="privacy-tip">Introduce una contraseña para ver la evaluación.</div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3>Interactivo 2FA</h3>
+            <p class="privacy-tip">Selecciona el método más seguro para proteger tu cuenta.</p>
+            <div class="options-grid" style="display:grid; gap:14px; margin-top:14px;">
+                <button class="btn-secondary" id="method-app" onclick="select2FAMethod('app')">App de autenticación</button>
+                <button class="btn-secondary" id="method-sms" onclick="select2FAMethod('sms')">Código por SMS</button>
+                <button class="btn-secondary" id="method-key" onclick="select2FAMethod('key')">Llave física</button>
+            </div>
+            <div id="method-feedback" class="sim-feedback hidden" style="margin-top:14px;"></div>
+        </div>
+
+        <div class="section-card">
+            <h3>Tareas del módulo</h3>
+            <div class="list-block" id="exercises-list"></div>
+            <div class="list-block" id="tests-list"></div>
+            <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+                <button id="mark-all" class="btn-primary" disabled title="Progreso automático">Progreso automático</button>
+                <a href="/dashboard" class="btn-secondary">Salir</a>
+            </div>
+        </div>
+
+        <div class="section-card quiz-section">
+            <h3>Prueba de comprensión</h3>
+            <p class="muted">Selecciona las respuestas correctas y valida tu prueba. Tienes 3 intentos.</p>
+            <div class="question-card" id="q1">
+                <p>1. ¿Qué mejora más la fuerza de una contraseña?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q1" data-option="a1" onclick="selectQuizOption(this, 'q1', 'a1')"><input type="radio" name="p1"> Añadir símbolos, números y más longitud.</label>
+                    <label class="option-label" data-question="q1" data-option="a2" onclick="selectQuizOption(this, 'q1', 'a2')"><input type="radio" name="p1"> Usar solo tu nombre y fecha.</label>
+                    <label class="option-label" data-question="q1" data-option="a3" onclick="selectQuizOption(this, 'q1', 'a3')"><input type="radio" name="p1"> Cambiarla una vez al año.</label>
+                </div>
+            </div>
+            <div class="question-card" id="q2">
+                <p>2. ¿Cuál es la ventaja más importante de 2FA?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q2" data-option="a1" onclick="selectQuizOption(this, 'q2', 'a1')"><input type="radio" name="p2"> Hace que tu cuenta dependa solo de la contraseña.</label>
+                    <label class="option-label" data-question="q2" data-option="a2" onclick="selectQuizOption(this, 'q2', 'a2')"><input type="radio" name="p2"> Añade otra comprobación además de la contraseña.</label>
+                    <label class="option-label" data-question="q2" data-option="a3" onclick="selectQuizOption(this, 'q2', 'a3')"><input type="radio" name="p2"> Hace que la contraseña sea visible.</label>
+                </div>
+            </div>
+            <div class="question-card" id="q3">
+                <p>3. ¿Qué hace un administrador de contraseñas?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q3" data-option="a1" onclick="selectQuizOption(this, 'q3', 'a1')"><input type="radio" name="p3"> Guarda y genera contraseñas únicas para cada cuenta.</label>
+                    <label class="option-label" data-question="q3" data-option="a2" onclick="selectQuizOption(this, 'q3', 'a2')"><input type="radio" name="p3"> Comparte tus contraseñas con otros usuarios.</label>
+                    <label class="option-label" data-question="q3" data-option="a3" onclick="selectQuizOption(this, 'q3', 'a3')"><input type="radio" name="p3"> Elimina todas tus cuentas viejas.</label>
+                </div>
+            </div>
+            <div class="question-card" id="q4">
+                <p>4. ¿Qué tipo de 2FA es más resistente a suplantaciones?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q4" data-option="a1" onclick="selectQuizOption(this, 'q4', 'a1')"><input type="radio" name="p4"> Llave física o app de autenticación.</label>
+                    <label class="option-label" data-question="q4" data-option="a2" onclick="selectQuizOption(this, 'q4', 'a2')"><input type="radio" name="p4"> Código enviado en la misma página web.</label>
+                    <label class="option-label" data-question="q4" data-option="a3" onclick="selectQuizOption(this, 'q4', 'a3')"><input type="radio" name="p4"> Contraseña guardada en el navegador.</label>
+                </div>
+            </div>
+            <div class="question-card" id="q5">
+                <p>5. ¿Cuál es la mejor forma de usar contraseñas en varios servicios?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q5" data-option="a1" onclick="selectQuizOption(this, 'q5', 'a1')"><input type="radio" name="p5"> Usar una contraseña única y diferente en cada servicio.</label>
+                    <label class="option-label" data-question="q5" data-option="a2" onclick="selectQuizOption(this, 'q5', 'a2')"><input type="radio" name="p5"> Reutilizar la misma contraseña en todas partes.</label>
+                    <label class="option-label" data-question="q5" data-option="a3" onclick="selectQuizOption(this, 'q5', 'a3')"><input type="radio" name="p5"> Compartir tu contraseña con amigos confiables.</label>
+                </div>
+            </div>
+            <div style="margin-top:18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <button id="validate-quiz" class="btn-primary">Validar respuestas</button>
+                <button id="restart-module" class="btn-secondary" onclick="resetModule()" style="display:none;">Reiniciar módulo</button>
+                <span id="attempts-info" class="muted">Intentos restantes: 2</span>
+            </div>
+            <div id="quiz-feedback" class="sim-feedback hidden"></div>
+        </div>
+    </main>
+
+    <script>
+        const MODULE_ID = 'm2';
+        const EXERCISES = ['Leer la teoría sobre contraseñas', 'Probar el generador de contraseña', 'Seleccionar método 2FA seguro'];
+        const TESTS = ['Prueba de seguridad de contraseñas y 2FA'];
+        const MAX_ATTEMPTS = 3;
+        const QUIZ_CORRECT = { q1: 'a1', q2: 'a2', q3: 'a1', q4: 'a1', q5: 'a1' };
+
+        function loadProgress() { try { return JSON.parse(localStorage.getItem('netshield_progress') || '{}'); } catch (e) { return {}; } }
+        function saveProgress(data) { localStorage.setItem('netshield_progress', JSON.stringify(data)); }
+        function ensure(state) {
+            if (!state[MODULE_ID]) {
+                state[MODULE_ID] = { exercises: EXERCISES.map(() => false), tests: TESTS.map(() => false), answers: {}, attemptsRemaining: MAX_ATTEMPTS };
+            }
+            if (!Array.isArray(state[MODULE_ID].exercises) || state[MODULE_ID].exercises.length !== EXERCISES.length) {
+                state[MODULE_ID].exercises = EXERCISES.map(() => false);
+            }
+            if (!Array.isArray(state[MODULE_ID].tests) || state[MODULE_ID].tests.length !== TESTS.length) {
+                state[MODULE_ID].tests = TESTS.map(() => false);
+            }
+            if (typeof state[MODULE_ID].attemptsRemaining !== 'number') state[MODULE_ID].attemptsRemaining = MAX_ATTEMPTS;
+            if (!state[MODULE_ID].answers) state[MODULE_ID].answers = {};
+        }
+
+        function getState() {
+            const state = loadProgress();
+            ensure(state);
+            return state;
+        }
+
+        function renderProgress() {
+            const state = getState();
+            const exercises = document.getElementById('exercises-list');
+            const tests = document.getElementById('tests-list');
+            exercises.innerHTML = '';
+            tests.innerHTML = '';
+            EXERCISES.forEach((text, index) => {
+                const label = document.createElement('label');
+                label.className = 'list-item';
+                label.innerHTML = `<input type="checkbox" ${state[MODULE_ID].exercises[index] ? 'checked' : ''} disabled><span>${text}</span>`;
+                exercises.appendChild(label);
+            });
+            const testLabel = document.createElement('label');
+            testLabel.className = 'list-item';
+            testLabel.innerHTML = `<input type="checkbox" ${state[MODULE_ID].tests[0] ? 'checked' : ''} disabled><span>${TESTS[0]}</span>`;
+            tests.appendChild(testLabel);
+            updateQuizUI();
+        }
+
+        function markTheoryRead() {
+            const state = getState();
+            state[MODULE_ID].exercises[0] = true;
+            saveProgress(state);
+            renderProgress();
+        }
+
+        function updateQuizUI() {
+            const state = getState();
+            document.querySelectorAll('.option-label').forEach(label => {
+                const questionId = label.dataset.question;
+                const optionId = label.dataset.option;
+                label.classList.toggle('selected-option', state[MODULE_ID].answers[questionId] === optionId);
+            });
+            const info = document.getElementById('attempts-info');
+            const button = document.getElementById('validate-quiz');
+            const restartButton = document.getElementById('restart-module');
+            if (state[MODULE_ID].tests[0]) {
+                info.innerText = 'Prueba completada ✅';
+                button.disabled = true;
+                if (restartButton) restartButton.style.display = 'none';
+            } else {
+                info.innerText = `Intentos restantes: ${state[MODULE_ID].attemptsRemaining}`;
+                button.disabled = state[MODULE_ID].attemptsRemaining <= 0;
+                if (restartButton) {
+                    restartButton.style.display = state[MODULE_ID].attemptsRemaining <= 0 ? 'inline-flex' : 'none';
+                }
+            }
+        }
+
+        function selectQuizOption(element, questionId, optionId) {
+            const state = getState();
+            state[MODULE_ID].answers[questionId] = optionId;
+            saveProgress(state);
+            document.querySelectorAll(`[data-question="${questionId}"]`).forEach(label => label.classList.remove('selected-option', 'option-correct', 'option-wrong'));
+            element.classList.add('selected-option');
+        }
+
+        function showQuizFeedback(message, bg, color) {
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+            feedback.innerText = message;
+            feedback.style.background = bg;
+            feedback.style.color = color;
+        }
+
+        function applyQuizFeedback() {
+            const state = getState();
+            Object.keys(QUIZ_CORRECT).forEach(questionId => {
+                const selected = state[MODULE_ID].answers[questionId];
+                const correct = QUIZ_CORRECT[questionId];
+                document.querySelectorAll(`[data-question="${questionId}"]`).forEach(label => {
+                    label.classList.remove('option-correct', 'option-wrong');
+                    if (label.dataset.option === correct) {
+                        label.classList.add('option-correct');
+                    }
+                    if (selected && label.dataset.option === selected && selected !== correct) {
+                        label.classList.add('option-wrong');
+                    }
+                });
+            });
+        }
+
+        function validateQuiz() {
+            const state = getState();
+            if (state[MODULE_ID].tests[0]) return;
+            const answers = state[MODULE_ID].answers || {};
+            const allAnswered = Object.keys(QUIZ_CORRECT).every(q => answers[q]);
+            if (!allAnswered) {
+                showQuizFeedback('Debes responder todas las preguntas antes de validar.', '#fde68a', '#92400e');
+                return;
+            }
+            const wrong = Object.keys(QUIZ_CORRECT).filter(q => answers[q] !== QUIZ_CORRECT[q]);
+            if (wrong.length === 0) {
+                state[MODULE_ID].tests[0] = true;
+                saveProgress(state);
+                showQuizFeedback('✅ Todas las respuestas son correctas. Prueba completada.', '#dcfce7', '#15803d');
+            } else {
+                state[MODULE_ID].attemptsRemaining = Math.max(0, state[MODULE_ID].attemptsRemaining - 1);
+                // If attempts exhausted, show restart button and keep the module for retry
+                if (state[MODULE_ID].attemptsRemaining === 0) {
+                    saveProgress(state);
+                    showQuizFeedback('❌ No quedan intentos. Usa el botón Reiniciar módulo para volver a intentarlo.', '#fee2e2', '#b91c1c');
+                    updateQuizUI();
+                    return;
+                }
+                saveProgress(state);
+                showQuizFeedback(`⚠️ Algunas respuestas son incorrectas. Te quedan ${state[MODULE_ID].attemptsRemaining} intentos.`, '#fee2e2', '#b91c1c');
+            }
+            applyQuizFeedback();
+            updateQuizUI();
+        }
+
+        function resetModule() {
+            const state = getState();
+            state[MODULE_ID].attemptsRemaining = MAX_ATTEMPTS;
+            state[MODULE_ID].answers = {};
+            state[MODULE_ID].tests[0] = false;
+            state[MODULE_ID].exercises = EXERCISES.map(() => false);
+            saveProgress(state);
+            document.querySelectorAll('.option-label').forEach(label => label.classList.remove('selected-option', 'option-correct', 'option-wrong'));
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            renderProgress();
+            updateQuizUI();
+        }
+
+        function updateStrength() {
+            const value = document.getElementById('password-input').value;
+            const fill = document.getElementById('strength-fill');
+            const label = document.getElementById('strength-label');
+            const score = Math.min(Math.round((value.length * 2) + (/[A-Z]/.test(value)*10) + (/[0-9]/.test(value)*10) + (/[^A-Za-z0-9]/.test(value)*15)), 100);
+            fill.style.width = score + '%';
+            if (!value) {
+                label.innerText = 'Introduce una contraseña para ver la evaluación.';
+                fill.style.width = '0%';
+                return;
+            }
+            if (score < 40) label.innerText = 'Débil: añade más caracteres y variedad.';
+            else if (score < 70) label.innerText = 'Aceptable: usa símbolos y mayúsculas.';
+            else label.innerText = 'Fuerte: buena combinación de longitud y caracteres.';
+            const state = getState();
+            state[MODULE_ID].exercises[1] = true;
+            saveProgress(state);
+            renderProgress();
+        }
+
+        function generatePassword() {
+            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+';
+            let pass = '';
+            for (let i = 0; i < 16; i++) pass += charset[Math.floor(Math.random() * charset.length)];
+            document.getElementById('password-input').value = pass;
+            updateStrength();
+            const state = getState();
+            state[MODULE_ID].exercises[1] = true;
+            saveProgress(state);
+            renderProgress();
+        }
+
+        function select2FAMethod(method) {
+            const feedback = document.getElementById('method-feedback');
+            const state = getState();
+            const buttons = ['method-app', 'method-sms', 'method-key'];
+            buttons.forEach(id => document.getElementById(id).classList.remove('btn-selected'));
+            document.getElementById(`method-${method}`).classList.add('btn-selected');
+            if (method === 'app' || method === 'key') {
+                feedback.classList.remove('hidden');
+                feedback.innerText = '✅ Correcto. Este es un método de 2FA más seguro y recomendable.';
+                feedback.style.background = '#dcfce7';
+                feedback.style.color = '#15803d';
+                state[MODULE_ID].exercises[2] = true;
+            } else {
+                feedback.classList.remove('hidden');
+                feedback.innerText = '⚠️ El SMS es menos seguro y puede ser interceptado. Usa una app o llave física si puedes.';
+                feedback.style.background = '#fde68a';
+                feedback.style.color = '#92400e';
+                state[MODULE_ID].exercises[2] = false;
+            }
+            saveProgress(state);
+            renderProgress();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('validate-quiz').addEventListener('click', validateQuiz);
+            document.getElementById('mark-theory').addEventListener('click', markTheoryRead);
+            renderProgress();
+        });
+    </script>
+</body>
+</html>

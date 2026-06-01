@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetShield - Alfabetización Digital</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo NetShield">
+            <span>NetShield</span>
+        </div>
+        <nav class="nav-links">
+            <a href="#hero">Inicio</a>
+            <a href="#features">Beneficios</a>
+            <a href="#modules">Módulos</a>
+            <a href="#about">¿Qué es?</a>
+            <a href="/login-page" class="btn-nav-login">Iniciar Sesión</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section" id="hero">
+            <div class="hero-container">
+                <div class="hero-copy">
+                    <span class="eyebrow">Aprende a navegar con seguridad</span>
+                    <h1>NetShield te ayuda a proteger tu privacidad digital paso a paso.</h1>
+                    <p>Participa en retos interactivos, domina contraseñas fuertes, reconoce amenazas en redes y controla tus datos en internet.</p>
+                    <div class="hero-buttons">
+                        <a href="/login-page" class="btn-hero-cta">Comenzar ahora</a>
+                        <a href="#modules" class="btn-hero-secondary">Ver módulos</a>
+                    </div>
+                    <div class="hero-highlights">
+                        <div class="highlight-item">
+                            <strong>5 módulos</strong>
+                            <span>Contenido claro y práctico.</span>
+                        </div>
+                        <div class="highlight-item">
+                            <strong>Reto diario</strong>
+                            <span>Actividades para aplicar lo aprendido.</span>
+                        </div>
+                        <div class="highlight-item">
+                            <strong>Aprendizaje gamificado</strong>
+                            <span>Progreso visible y motivador.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-media">
+                    <div class="hero-card">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80" alt="Protección digital" loading="lazy">
+                        <div class="hero-card-overlay">
+                            <div>
+                                <p>Accede al contenido desde tu panel</p>
+                                <strong>NetShield Dashboard</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <strong>90%</strong>
+                    <p>de los estudiantes mejora su seguridad personal.</p>
+                </article>
+                <article class="stat-card">
+                    <strong>5</strong>
+                    <p>módulos con ejercicios prácticos y pruebas.</p>
+                </article>
+                <article class="stat-card">
+                    <strong>100%</strong>
+                    <p>orientado al aprendizaje de jóvenes y docentes.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <div class="section-header">
+                <span class="eyebrow">Beneficios</span>
+                <h2>Aprende sobre privacidad, redes sociales y seguridad real.</h2>
+                <p class="section-subtitle">NetShield combina teoría accesible con actividades prácticas y ejemplos cotidianos.</p>
+            </div>
+            <div class="features-grid">
+                <article class="feature-card">
+                    <span class="material-symbols-outlined f-icon">cookie</span>
+                    <h3>Cookies y rastreo</h3>
+                    <p>Entiende quién te sigue en línea y cómo reducir el perfilamiento.</p>
+                </article>
+                <article class="feature-card">
+                    <span class="material-symbols-outlined f-icon">lock</span>
+                    <h3>Contraseñas blindadas</h3>
+                    <p>Construye cuentas seguras y protege tu información personal de accesos no autorizados.</p>
+                </article>
+                <article class="feature-card">
+                    <span class="material-symbols-outlined f-icon">shield</span>
+                    <h3>Emergencias digitales</h3>
+                    <p>Aprende a detectar fraudes, amenazas en redes sociales y cómo reaccionar frente a un ataque.</p>
+                </article>
+                <article class="feature-card">
+                    <span class="material-symbols-outlined f-icon">phone_android</span>
+                    <h3>Permisos y apps</h3>
+                    <p>Revisa qué datos piden las aplicaciones y cómo evitar permisos innecesarios.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="modules" class="modules-section">
+            <div class="section-header small">
+                <h2>Explora los módulos interactivos</h2>
+                <p class="section-subtitle">Cada módulo incluye teoría, actividades y pruebas para afianzar lo aprendido.</p>
+            </div>
+            <div class="modules-grid">
+                <article class="module-card">
+                    <span class="material-symbols-outlined module-icon">brightness_auto</span>
+                    <h3>Módulo 1</h3>
+                    <p>Cookies y rastreo web con mini retos de análisis.</p>
+                </article>
+                <article class="module-card">
+                    <span class="material-symbols-outlined module-icon">key</span>
+                    <h3>Módulo 2</h3>
+                    <p>Contraseñas fuertes, autenticación y buenas prácticas.</p>
+                </article>
+                <article class="module-card">
+                    <span class="material-symbols-outlined module-icon">security</span>
+                    <h3>Módulo 3</h3>
+                    <p>Aplicaciones móviles y permisos expuestos.</p>
+                </article>
+                <article class="module-card">
+                    <span class="material-symbols-outlined module-icon">wifi</span>
+                    <h3>Módulo 4</h3>
+                    <p>Redes Wi-Fi y VPNs: cómo navegar con más seguridad.</p>
+                </article>
+                <article class="module-card">
+                    <span class="material-symbols-outlined module-icon">public</span>
+                    <h3>Módulo 5</h3>
+                    <p>Privacidad en redes sociales y reputación digital.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="about" class="about-section">
+            <div class="about-content">
+                <div>
+                    <span class="eyebrow">¿Qué es NetShield?</span>
+                    <h2>Una plataforma educativa pensada para estudiantes y docentes.</h2>
+                    <p>NetShield ofrece una experiencia clara, accesible y práctica. Combina explicaciones fáciles, actividades interactivas y un panel personal con tu progreso y avatares.</p>
+                    <ul class="about-list">
+                        <li>Guías paso a paso con lenguaje sencillo.</li>
+                        <li>Actividades que se adaptan a la vida real.</li>
+                        <li>Evaluaciones que muestran tu avance.</li>
+                    </ul>
+                </div>
+                <div class="about-card">
+                    <h3>¿Por qué estudiar con nosotros?</h3>
+                    <p>Porque te prepara para usar internet sin miedo, a reconocer riesgos y a cuidar tu identidad digital con confianza.</p>
+                    <div class="about-badges">
+                        <span>Interactivo</span>
+                        <span>Diseño juvenil</span>
+                        <span>Accesible</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="testimonials-section">
+            <div class="section-header small">
+                <h2>Lo que dicen los estudiantes</h2>
+            </div>
+            <div class="testimonials-grid">
+                <article class="testimonial-card">
+                    <p>"NetShield me ayudó a entender qué permisos aceptar y qué datos son privados. Lo recomiendo para todas las escuelas."</p>
+                    <strong>María, 16 años</strong>
+                </article>
+                <article class="testimonial-card">
+                    <p>"Los retos son claros y motivan a aprender con ejemplos reales. Mi perfil en redes ya está mucho más seguro."</p>
+                    <strong>Carlos, 17 años</strong>
+                </article>
+                <article class="testimonial-card">
+                    <p>"Como docente, me encanta que los módulos sean prácticos y bien organizados. Los chicos aprenden rápido."</p>
+                    <strong>Ana, profesora</strong>
+                </article>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="cta-card">
+                <div>
+                    <h2>Empieza hoy a cuidar tu identidad digital</h2>
+                    <p>Únete a NetShield y avanza con lecciones claras, actividades interactivas y un panel personalizado.</p>
+                </div>
+                <a href="/login-page" class="btn-hero-cta">Ingresar ahora</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>© 2026 NetShield • Plataforma Educativa de Privacidad Digital</p>
+    </footer>
+
+</body>
+</html>

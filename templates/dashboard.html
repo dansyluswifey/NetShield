@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetShield - Panel de Control</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            <span>NetShield</span>
+        </div>
+        
+        <div class="user-profile-box">
+            <div class="avatar-editor" onclick="toggleAvatarSelector()" title="Cambiar avatar">
+                <img id="current-avatar" src="{{ url_for('static', filename='images/avatares/' ~ avatar) }}" alt="Avatar" class="profile-avatar">
+                <span class="avatar-editor-text">Cambiar avatar</span>
+            </div>
+            <p class="profile-name">@{{ username }}</p>
+            <span class="badge-rango">Estudiante Seguro</span>
+            <div id="avatar-selector" class="avatar-selector-panel hidden">
+                <h3>Selecciona tu nuevo avatar</h3>
+                <div class="avatar-picker-grid" id="avatar-picker-grid"></div>
+                <div class="avatar-selector-actions">
+                    <span class="avatar-selector-message">Haz clic en el avatar deseado y guarda.</span>
+                    <button type="button" class="btn-primary" onclick="saveAvatarChange()">Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="#" class="menu-item active" data-view="dashboard"><span class="material-symbols-outlined">space_dashboard</span> Dashboard</a>
+            <a href="#" class="menu-item" data-view="achievements"><span class="material-symbols-outlined">emoji_events</span> Logros</a>
+            <a href="/logout" class="menu-item btn-logout"><span class="material-symbols-outlined">logout</span> Salir</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1 id="greeting">¡Hola de nuevo, {{ username }}! 👋</h1>
+                <p class="subtitle">Continúa desarrollando tus competencias en privacidad digital.</p>
+            </div>
+            <div class="global-progress-card">
+                <div class="progress-info">
+                    <span>Progreso Total</span>
+                    <strong id="global-progress-percent">0%</strong>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="global-progress-fill" class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div id="certificate-action" style="display:none; margin-top:1rem;">
+                    <button class="btn-secondary" onclick="generateCertificate()">Generar certificado PDF</button>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-grid">
+            <div class="modules-list">
+                <div class="modules-header">
+                    <h2>Módulos</h2>
+                    <p class="muted">Selecciona un módulo para ver ejercicios y pruebas.</p>
+                </div>
+                <div id="modules-container" class="modules-grid"></div>
+            </div>
+
+            <div class="module-detail" id="module-detail">
+                <!-- Dinámico: título, descripción, ejercicios y pruebas -->
+            </div>
+
+            <aside class="achievements-panel" id="achievements-panel">
+                <h3>Logros</h3>
+                <div id="achievements-list" class="achievements-list">
+                    <!-- Logros dinámicos -->
+                </div>
+                <div class="small-help">Progreso guardado localmente. </div>
+            </aside>
+        </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Datos de módulos (puedes transformar esto a backend-rendered JSON)
+        const MODULES = [
+            { id: 'm1', path: '/modulo1', title: 'Módulo 1: El Rastro de las Cookies', short: 'Cookies y rastreo', description: 'Identifica cómo se rastrea tu actividad y aprende a bloquear rastreadores.', exercises: [ 'Leer el material de aprendizaje del módulo', 'Completar el simulador del banner de cookies', 'Ver el ejemplo visual de cookies', 'Revisar el contenido del módulo' ], tests: [ 'Quiz de comprensión' ] },
+            { id: 'm2', path: '/modulo2', title: 'Módulo 2: Llaves Fuertes & 2FA', short: 'Contraseñas y 2FA', description: 'Crea contraseñas seguras y configura 2FA en servicios comunes.', exercises: [ 'Leer la teoría sobre contraseñas', 'Probar el generador de contraseña', 'Seleccionar método 2FA seguro' ], tests: [ 'Prueba de seguridad de contraseñas y 2FA' ] },
+            { id: 'm3', path: '/modulo3', title: 'Módulo 3: Permisos de Aplicaciones', short: 'Permisos móviles', description: 'Auditoría de permisos y análisis de datos compartidos por apps.', exercises: [ 'Leer la teoría sobre permisos', 'Seleccionar una app en el simulador', 'Simular revisión de permisos', 'Completar el quiz del módulo' ], tests: [ 'Prueba de permisos y privacidad' ] },
+            { id: 'm4', path: '/modulo4', title: 'Módulo 4: Redes Wi-Fi y VPNs', short: 'Redes seguras', description: 'Aprende a detectar Wi‑Fi inseguras y cómo usar VPNs responsables.', exercises: [ 'Leer la teoría de redes seguras', 'Ver el riesgo de cada conexión', 'Simular protección con VPN', 'Completar el quiz del módulo' ], tests: [ 'Prueba de seguridad en redes' ] },
+            { id: 'm5', path: '/modulo5', title: 'Módulo 5: Privacidad en Redes Sociales', short: 'Redes sociales', description: 'Configura privacidad, revisa políticas y gestiona huella digital.', exercises: [ 'Leer el contenido de privacidad', 'Ajustar las configuraciones de perfil', 'Evaluar una etiqueta sin permiso', 'Completar el quiz de redes sociales' ], tests: [ 'Prueba de privacidad en redes sociales' ] }
+        ];
+
+        // Progreso estructura: { m1: { exercises: [true,false...], tests: [true...] }, ... }
+        function loadProgress() {
+            try {
+                const raw = localStorage.getItem('netshield_progress');
+                return raw ? JSON.parse(raw) : {};
+            } catch (e) { console.warn('No se pudo leer progreso', e); return {}; }
+        }
+
+        function saveProgress(data) {
+            localStorage.setItem('netshield_progress', JSON.stringify(data));
+            updateGlobalProgressUI(data);
+            renderAchievements(data);
+        }
+
+        function ensureModuleProgress(state, module) {
+            if (!state[module.id]) {
+                state[module.id] = { exercises: module.exercises.map(()=>false), tests: module.tests.map(()=>false) };
+            }
+        }
+
+        function renderModules() {
+            const container = document.getElementById('modules-container');
+            container.innerHTML = '';
+            const state = loadProgress();
+            MODULES.forEach((m, idx) => {
+                ensureModuleProgress(state, m);
+                const completedCount = state[m.id].exercises.filter(Boolean).length + state[m.id].tests.filter(Boolean).length;
+                const total = m.exercises.length + m.tests.length;
+                const pct = Math.round((completedCount/total)*100);
+
+                const card = document.createElement('div');
+                card.className = 'module-card';
+                if (idx === 0 || pct>0) card.classList.add('available');
+                card.innerHTML = `
+                    <div class="card-top">
+                        <h4>${m.title}</h4>
+                        <div class="card-meta">${pct}%</div>
+                    </div>
+                    <p class="muted">${m.short}</p>
+                    <div class="card-footer">
+                        <button class="btn-primary btn-sm" onclick="selectModule('${m.id}')">Abrir módulo</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            updateGlobalProgressUI(state);
+        }
+
+        function selectModule(id) {
+            const module = MODULES.find(m=>m.id===id);
+            if (!module) return;
+            const state = loadProgress();
+            ensureModuleProgress(state, module);
+            const detail = document.getElementById('module-detail');
+            detail.innerHTML = '';
+
+            const header = document.createElement('div');
+            header.className = 'module-header';
+            header.innerHTML = `
+                <h2>${module.title}</h2>
+                <p class="muted">${module.description}</p>
+            `;
+            detail.appendChild(header);
+
+            const exercisesCard = document.createElement('div');
+            exercisesCard.className = 'panel-card';
+            exercisesCard.innerHTML = `<h3>Ejercicios</h3>`;
+            const exList = document.createElement('div');
+            exList.className = 'list-block';
+            module.exercises.forEach((ex, i)=>{
+                const done = state[module.id].exercises[i];
+                const item = document.createElement('label');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <input type="checkbox" ${done? 'checked' : ''} disabled>
+                    <span>${ex}</span>
+                `;
+                exList.appendChild(item);
+            });
+            exercisesCard.appendChild(exList);
+            detail.appendChild(exercisesCard);
+
+            const testsCard = document.createElement('div');
+            testsCard.className = 'panel-card';
+            testsCard.innerHTML = `<h3>Pruebas</h3>`;
+            const testList = document.createElement('div');
+            testList.className = 'list-block';
+            module.tests.forEach((t, i)=>{
+                const done = state[module.id].tests[i];
+                const item = document.createElement('label');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <input type="checkbox" ${done? 'checked' : ''} disabled>
+                    <span>${t}</span>
+                `;
+                testList.appendChild(item);
+            });
+            testsCard.appendChild(testList);
+            detail.appendChild(testsCard);
+
+            const accessCard = document.createElement('div');
+            accessCard.className = 'panel-card';
+            accessCard.innerHTML = `<a class="btn-primary" href="${module.path}">Ir al módulo</a>`;
+            detail.appendChild(accessCard);
+        }
+
+        function toggleExercise(moduleId, index) {
+            const state = loadProgress();
+            state[moduleId].exercises[index] = !state[moduleId].exercises[index];
+            saveProgress(state);
+            renderModules();
+            selectModule(moduleId);
+            checkUnlocks(state);
+        }
+
+        function toggleTest(moduleId, index) {
+            const state = loadProgress();
+            state[moduleId].tests[index] = !state[moduleId].tests[index];
+            saveProgress(state);
+            renderModules();
+            selectModule(moduleId);
+            checkUnlocks(state);
+        }
+
+        function updateGlobalProgressUI(state) {
+            const totals = MODULES.reduce((acc, m)=>{
+                const s = state[m.id] || { exercises: [], tests: [] };
+                acc.completed += (s.exercises.filter(Boolean).length + s.tests.filter(Boolean).length);
+                acc.total += (m.exercises.length + m.tests.length);
+                return acc;
+            }, { completed:0, total:0 });
+            const pct = totals.total ? Math.round((totals.completed / totals.total)*100) : 0;
+            document.getElementById('global-progress-percent').innerText = pct + '%';
+            document.getElementById('global-progress-fill').style.width = pct + '%';
+            renderCertificateButton(state);
+            renderAchievements(state);
+        }
+
+        function isCourseComplete(state) {
+            return MODULES.every(m => {
+                const moduleState = state[m.id] || { exercises: [], tests: [] };
+                const completed = moduleState.exercises.filter(Boolean).length + moduleState.tests.filter(Boolean).length;
+                const total = m.exercises.length + m.tests.length;
+                return total > 0 && completed === total;
+            });
+        }
+
+        function renderCertificateButton(state) {
+            const action = document.getElementById('certificate-action');
+            if (!action) return;
+            action.style.display = isCourseComplete(state) ? 'block' : 'none';
+        }
+
+        function renderAchievements(state) {
+            const list = document.getElementById('achievements-list');
+            const progressState = state || loadProgress();
+            const totalExercises = MODULES.reduce((acc,m)=> acc + m.exercises.length + m.tests.length, 0);
+            const completedCount = MODULES.reduce((acc, m)=>{
+                const moduleState = progressState[m.id] || { exercises: [], tests: [] };
+                return acc + moduleState.exercises.filter(Boolean).length + moduleState.tests.filter(Boolean).length;
+            }, 0);
+            const completedModules = MODULES.reduce((acc, m)=>{
+                const moduleState = progressState[m.id] || { exercises: [], tests: [] };
+                const moduleTotal = m.exercises.length + m.tests.length;
+                const moduleCompleted = moduleState.exercises.filter(Boolean).length + moduleState.tests.filter(Boolean).length;
+                return acc + (moduleCompleted === moduleTotal ? 1 : 0);
+            }, 0);
+
+            const achievements = [
+                { id: 'a1', title: 'Bienvenida', desc: 'Ingresaste al dashboard.', unlocked: true },
+                { id: 'a2', title: 'Primer paso', desc: 'Completaste tu primer ejercicio o prueba.', unlocked: completedCount >= 1 },
+                { id: 'a3', title: 'Mitad del curso', desc: 'Alcanzaste el 50% de progreso del curso.', unlocked: totalExercises ? (completedCount / totalExercises) >= 0.5 : false },
+                { id: 'a4', title: 'Módulo completo', desc: 'Terminaste al menos un módulo completo.', unlocked: completedModules >= 1 },
+                { id: 'a5', title: 'Curso finalizado', desc: 'Lograste el 100% del curso.', unlocked: completedModules === MODULES.length }
+            ];
+
+            list.innerHTML = '';
+            achievements.forEach(a=>{
+                const el = document.createElement('div');
+                el.className = 'achievement' + (a.unlocked ? ' unlocked' : ' locked');
+                el.innerHTML = `<strong>${a.title}</strong><div class="muted">${a.desc}</div>`;
+                list.appendChild(el);
+            });
+            renderCertificateButton(progressState);
+        }
+
+        function generateCertificate() {
+            const state = loadProgress();
+            if (!isCourseComplete(state)) {
+                alert('Completa el curso al 100% para generar tu certificado.');
+                return;
+            }
+            const user = '@{{ username }}';
+            const date = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+            const jspdfLib = window.jspdf || window.jsPDF || null;
+            const jsPDFClass = jspdfLib ? jspdfLib.jsPDF || jspdfLib : null;
+            if (!jsPDFClass) {
+                alert('No se pudo cargar la biblioteca de PDF. Intenta nuevamente.');
+                return;
+            }
+            const doc = new jsPDFClass({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+            const width = doc.internal.pageSize.getWidth();
+            const height = doc.internal.pageSize.getHeight();
+            doc.setFillColor(245, 245, 255);
+            doc.rect(0, 0, width, height, 'F');
+            doc.setFontSize(36);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Certificado de Finalización', width / 2, 120, { align: 'center' });
+            doc.setLineWidth(1);
+            doc.line(80, 140, width - 80, 140);
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Se certifica que ${user}`, width / 2, 190, { align: 'center' });
+            doc.setFontSize(16);
+            doc.text('ha completado satisfactoriamente el curso de NetShield sobre privacidad digital.', width / 2, 220, { align: 'center', maxWidth: width - 160 });
+            doc.text(`Fecha de emisión: ${date}`, width / 2, 260, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text('NetShield • Alfabetización digital segura', width / 2, height - 80, { align: 'center' });
+            const filename = `Certificado_NetShield_${user.replace('@', '').replace(/\s+/g, '_')}.pdf`;
+            doc.save(filename);
+        }
+
+        function checkUnlocks(state) {
+            // Basic unlocking: module n unlocked when previous completed at least one test or all exercises done
+            // (This demo uses soft unlocks; integrate with backend for stricter control.)
+            // Not implemented further here but a hook for server sync.
+        }
+
+        const AVAILABLE_AVATARS = [
+            'avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png',
+            'avatar5.png', 'avatar6.png', 'avatar7.png', 'avatar8.png'
+        ];
+        let selectedAvatar = '{{ avatar }}';
+
+        function toggleAvatarSelector() {
+            const panel = document.getElementById('avatar-selector');
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden')) {
+                renderAvatarOptions();
+            }
+        }
+
+        function renderAvatarOptions() {
+            const grid = document.getElementById('avatar-picker-grid');
+            grid.innerHTML = '';
+            AVAILABLE_AVATARS.forEach(avatarName => {
+                const item = document.createElement('div');
+                item.className = 'avatar-picker-item' + (avatarName === selectedAvatar ? ' selected' : '');
+                item.innerHTML = `<img src="{{ url_for('static', filename='images/avatares/') }}${avatarName}" alt="${avatarName}">`;
+                item.onclick = () => selectAvatar(avatarName);
+                grid.appendChild(item);
+            });
+        }
+
+        function selectAvatar(avatarName) {
+            selectedAvatar = avatarName;
+            document.getElementById('current-avatar').src = `{{ url_for('static', filename='images/avatares/') }}${avatarName}`;
+            renderAvatarOptions();
+        }
+
+        async function saveAvatarChange() {
+            try {
+                const response = await fetch('{{ url_for('update_avatar') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ avatar: selectedAvatar })
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    const selector = document.getElementById('avatar-selector');
+                    selector.classList.add('hidden');
+                    document.getElementById('current-avatar').src = `{{ url_for('static', filename='images/avatares/') }}${selectedAvatar}`;
+                    alert('Avatar actualizado correctamente.');
+                } else {
+                    alert(result.error || 'No se pudo guardar el avatar.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error de red al guardar el avatar.');
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', ()=>{
+            renderModules();
+            renderAchievements();
+            // Select first module by default
+            if (MODULES.length) selectModule(MODULES[0].id);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Módulo 4 - Redes & VPN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .learning-container { max-width: 900px; margin:0 auto; padding:32px; }
+        .section-card { background:#ffffff; border:1px solid rgba(148,163,184,0.16); border-radius:18px; padding:24px; margin-bottom:24px; }
+        .interactive-box { display:flex; flex-direction:column; gap:16px; }
+        .risk-card { background: #f8fafc; border-radius:16px; border:1px solid rgba(148,163,184,0.2); padding:18px; }
+        .module-visual { width:100%; border-radius:20px; object-fit:cover; box-shadow:0 20px 45px rgba(15,23,42,0.12); margin-top:18px; }
+        .exercise-suggestions { list-style:none; margin:1rem 0 0; padding:0; display:grid; gap:12px; }
+        .exercise-suggestions li { background:#eef6ff; border-radius:14px; padding:14px 16px; color:#1e293b; }
+        .quiz-section { border-top: 2px solid rgba(148,163,184,0.25); padding-top: 2rem; }
+        .question-card { margin-bottom: 2rem; }
+        .question-card p { font-weight: 700; margin-bottom: 1rem; }
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-label { background: #f1f5f9; border: 1px solid rgba(148,163,184,0.35); padding: 14px 16px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; transition: background 0.2s; }
+        .option-label:hover { background: #e2e8f0; }
+        .option-label.selected-option { border-color: #2563eb; background: #eff6ff; }
+        .option-label input { display: none; }
+        .option-correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; }
+        .option-wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+    </style>
+</head>
+<body>
+    <main class="learning-container">
+        <a href="/dashboard" class="btn-secondary" style="margin-bottom:16px; display:inline-block">← Volver al Dashboard</a>
+        <div class="section-card">
+            <h2>Módulo 4: Redes & VPN</h2>
+            <p>Al conectarte a Internet, tu información viaja por una red. En una red pública o insegura, esa información puede ser interceptada. Un VPN crea un túnel cifrado que protege tu tráfico.</p>
+            <p>Este módulo te ayuda a identificar redes riesgosas y comprender cuándo deberías proteger tus datos con cifrado adicional.</p>
+            <button id="mark-theory" class="btn-secondary" style="margin-top:1rem;">Marcar teoría como leída</button>
+            <img class="module-visual" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80" alt="Seguridad en redes" loading="lazy">
+        </div>
+
+        <div class="section-card">
+            <h3>Interactivo: Elige una red y ve el riesgo</h3>
+            <div class="interactive-box">
+                <select id="network-select" onchange="updateNetworkRisk(true)" style="padding:14px 16px; border-radius:14px; border:1px solid rgba(148,163,184,0.5); width:100%; max-width:360px;">
+                    <option value="home">Wi-Fi de casa</option>
+                    <option value="cafe">Wi-Fi de cafetería</option>
+                    <option value="vpn">VPN activada</option>
+                    <option value="publica">Red pública abierta</option>
+                </select>
+                <div class="risk-card" id="network-risk"></div>
+                <button class="btn-secondary" onclick="markNetworkSafe()">Simular protección con VPN</button>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3>Ejercicio real: elige cómo actuar en una red pública</h3>
+            <p class="muted">Decide qué debes hacer si necesitas enviar información desde una red pública.</p>
+            <div class="interactive-box" style="margin-top:14px; gap:12px;">
+                <p><strong>Escenario:</strong> Estás en una cafetería y necesitas enviar un mensaje con información personal.</p>
+                <button class="btn-secondary" onclick="evaluateNetworkScenario('vpn')">Usar VPN antes de enviar</button>
+                <button class="btn-secondary" onclick="evaluateNetworkScenario('public')">Enviar sin VPN</button>
+                <button class="btn-secondary" onclick="evaluateNetworkScenario('off')">Cambiar a datos móviles</button>
+                <div id="network-scenario-feedback" class="sim-feedback hidden" style="margin-top:12px;"></div>
+            </div>
+        </div>
+        <div class="section-card">
+            <h3>Tareas del módulo</h3>
+            <div class="list-block" id="exercises-list"></div>
+            <div class="list-block" id="tests-list"></div>
+            <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+                <button id="mark-all" class="btn-primary" disabled title="Progreso automático">Progreso automático</button>
+                <a href="/dashboard" class="btn-secondary">Salir</a>
+            </div>
+        </div>
+
+        <div class="section-card quiz-section">
+            <h3>Prueba de comprensión</h3>
+            <p class="muted">Selecciona las respuestas correctas y valida tu prueba. Tienes 3 intentos.</p>
+            <div class="question-card" id="q1">
+                <p>1. ¿Dónde debes tener más cuidado con tu conexión?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q1" data-option="a1" onclick="selectQuizOption(this, 'q1', 'a1')"><input type="radio" name="p1"> En la red de casa privada.</label>
+                    <label class="option-label" data-question="q1" data-option="a2" onclick="selectQuizOption(this, 'q1', 'a2')"><input type="radio" name="p1"> En una VPN confiable.</label>
+                    <label class="option-label" data-question="q1" data-option="a3" onclick="selectQuizOption(this, 'q1', 'a3')"><input type="radio" name="p1"> En una red pública abierta como un café.</label>
+                </div>
+            </div>
+            <div class="question-card" id="q2">
+                <p>2. ¿Qué hace un VPN?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q2" data-option="a1" onclick="selectQuizOption(this, 'q2', 'a1')"><input type="radio" name="p2"> Cifra tu tráfico y lo envía a través de un servidor seguro.</label>
+                    <label class="option-label" data-question="q2" data-option="a2" onclick="selectQuizOption(this, 'q2', 'a2')"><input type="radio" name="p2"> Aumenta la velocidad de tu conexión.</label>
+                    <label class="option-label" data-question="q2" data-option="a3" onclick="selectQuizOption(this, 'q2', 'a3')"><input type="radio" name="p2"> Bloquea todas las webs excepto las de entretenimiento.</label>
+                </div>
+            </div>
+            <div class="question-card" id="q3">
+                <p>3. ¿Cuál es una buena práctica cuando usas una red Wi-Fi pública?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q3" data-option="a1" onclick="selectQuizOption(this, 'q3', 'a1')"><input type="radio" name="p3"> Usar VPN y evitar ingresar datos sensibles.</label>
+                    <label class="option-label" data-question="q3" data-option="a2" onclick="selectQuizOption(this, 'q3', 'a2')"><input type="radio" name="p3"> Compartir la contraseña con cualquier persona.</label>
+                    <label class="option-label" data-question="q3" data-option="a3" onclick="selectQuizOption(this, 'q3', 'a3')"><input type="radio" name="p3"> Desactivar el cifrado del navegador.</label>
+                </div>
+            </div>
+            <div class="question-card" id="q4">
+                <p>4. ¿Cuál red ofrece el mayor nivel de privacidad?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q4" data-option="a1" onclick="selectQuizOption(this, 'q4', 'a1')"><input type="radio" name="p4"> VPN activada</label>
+                    <label class="option-label" data-question="q4" data-option="a2" onclick="selectQuizOption(this, 'q4', 'a2')"><input type="radio" name="p4"> Wi-Fi pública abierta</label>
+                    <label class="option-label" data-question="q4" data-option="a3" onclick="selectQuizOption(this, 'q4', 'a3')"><input type="radio" name="p4"> Wi-Fi de cafetería sin contraseña</label>
+                </div>
+            </div>
+            <div class="question-card" id="q5">
+                <p>5. ¿Qué debes hacer si no confías en una red?</p>
+                <div class="options-list">
+                    <label class="option-label" data-question="q5" data-option="a1" onclick="selectQuizOption(this, 'q5', 'a1')"><input type="radio" name="p5"> Conectarte solo si usas VPN y evitas datos sensibles.</label>
+                    <label class="option-label" data-question="q5" data-option="a2" onclick="selectQuizOption(this, 'q5', 'a2')"><input type="radio" name="p5"> Ingresar todas tus contraseñas de todas formas.</label>
+                    <label class="option-label" data-question="q5" data-option="a3" onclick="selectQuizOption(this, 'q5', 'a3')"><input type="radio" name="p5"> Compartir la red con personas extrañas.</label>
+                </div>
+            </div>
+            <div style="margin-top:18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <button id="validate-quiz" class="btn-primary">Validar respuestas</button>
+                <button id="restart-module" class="btn-secondary" onclick="resetModule()" style="display:none;">Reiniciar módulo</button>
+                <span id="attempts-info" class="muted">Intentos restantes: 2</span>
+            </div>
+            <div id="quiz-feedback" class="sim-feedback hidden"></div>
+        </div>
+    </main>
+
+    <script>
+        const MODULE_ID = 'm4';
+        const EXERCISES = ['Leer la teoría de redes seguras', 'Ver el riesgo de cada conexión', 'Simular protección con VPN', 'Evaluar un escenario de red segura'];
+        const TESTS = ['Prueba de seguridad en redes'];
+        const MAX_ATTEMPTS = 3;
+        const QUIZ_CORRECT = { q1: 'a3', q2: 'a1', q3: 'a1', q4: 'a1', q5: 'a1' };
+
+        function loadProgress() { try { return JSON.parse(localStorage.getItem('netshield_progress') || '{}'); } catch (e) { return {}; } }
+        function saveProgress(data) { localStorage.setItem('netshield_progress', JSON.stringify(data)); }
+        function ensure(state) {
+            if (!state[MODULE_ID]) state[MODULE_ID] = { exercises: EXERCISES.map(() => false), tests: TESTS.map(() => false), answers: {}, attemptsRemaining: MAX_ATTEMPTS };
+            if (typeof state[MODULE_ID].attemptsRemaining !== 'number') state[MODULE_ID].attemptsRemaining = MAX_ATTEMPTS;
+            if (!state[MODULE_ID].answers) state[MODULE_ID].answers = {};
+        }
+
+        function getState() {
+            const state = loadProgress();
+            ensure(state);
+            return state;
+        }
+
+        function renderProgress() {
+            const state = getState();
+            const exercises = document.getElementById('exercises-list');
+            const tests = document.getElementById('tests-list');
+            exercises.innerHTML = '';
+            tests.innerHTML = '';
+            EXERCISES.forEach((text, index) => {
+                const label = document.createElement('label');
+                label.className = 'list-item';
+                label.innerHTML = `<input type="checkbox" ${state[MODULE_ID].exercises[index] ? 'checked' : ''} disabled><span>${text}</span>`;
+                exercises.appendChild(label);
+            });
+            const testLabel = document.createElement('label');
+            testLabel.className = 'list-item';
+            testLabel.innerHTML = `<input type="checkbox" ${state[MODULE_ID].tests[0] ? 'checked' : ''} disabled><span>${TESTS[0]}</span>`;
+            tests.appendChild(testLabel);
+            updateQuizUI();
+        }
+
+        function updateQuizUI() {
+            const state = getState();
+            document.querySelectorAll('.option-label').forEach(label => {
+                const questionId = label.dataset.question;
+                const optionId = label.dataset.option;
+                label.classList.toggle('selected-option', state[MODULE_ID].answers[questionId] === optionId);
+            });
+            const info = document.getElementById('attempts-info');
+            const button = document.getElementById('validate-quiz');
+            const restartButton = document.getElementById('restart-module');
+            if (state[MODULE_ID].tests[0]) {
+                info.innerText = 'Prueba completada ✅';
+                button.disabled = true;
+                if (restartButton) restartButton.style.display = 'none';
+            } else {
+                info.innerText = `Intentos restantes: ${state[MODULE_ID].attemptsRemaining}`;
+                button.disabled = state[MODULE_ID].attemptsRemaining <= 0;
+                if (restartButton) {
+                    restartButton.style.display = state[MODULE_ID].attemptsRemaining <= 0 ? 'inline-flex' : 'none';
+                }
+            }
+        }
+
+        function selectQuizOption(element, questionId, optionId) {
+            const state = getState();
+            state[MODULE_ID].answers[questionId] = optionId;
+            saveProgress(state);
+            document.querySelectorAll(`[data-question="${questionId}"]`).forEach(label => label.classList.remove('selected-option', 'option-correct', 'option-wrong'));
+            element.classList.add('selected-option');
+        }
+
+        function showQuizFeedback(message, bg, color) {
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+            feedback.innerText = message;
+            feedback.style.background = bg;
+            feedback.style.color = color;
+        }
+
+        function applyQuizFeedback() {
+            const state = getState();
+            Object.keys(QUIZ_CORRECT).forEach(questionId => {
+                const selected = state[MODULE_ID].answers[questionId];
+                const correct = QUIZ_CORRECT[questionId];
+                document.querySelectorAll(`[data-question="${questionId}"]`).forEach(label => {
+                    label.classList.remove('option-correct', 'option-wrong');
+                    if (label.dataset.option === correct) {
+                        label.classList.add('option-correct');
+                    }
+                    if (selected && label.dataset.option === selected && selected !== correct) {
+                        label.classList.add('option-wrong');
+                    }
+                });
+            });
+        }
+
+        function validateQuiz() {
+            const state = getState();
+            if (state[MODULE_ID].tests[0]) return;
+            const answers = state[MODULE_ID].answers || {};
+            const allAnswered = Object.keys(QUIZ_CORRECT).every(q => answers[q]);
+            if (!allAnswered) {
+                showQuizFeedback('Debes responder todas las preguntas antes de validar.', '#fde68a', '#92400e');
+                return;
+            }
+            const wrong = Object.keys(QUIZ_CORRECT).filter(q => answers[q] !== QUIZ_CORRECT[q]);
+            if (wrong.length === 0) {
+                state[MODULE_ID].tests[0] = true;
+                saveProgress(state);
+                showQuizFeedback('✅ Todas las respuestas son correctas. Prueba completada.', '#dcfce7', '#15803d');
+            } else {
+                state[MODULE_ID].attemptsRemaining = Math.max(0, state[MODULE_ID].attemptsRemaining - 1);
+                saveProgress(state);
+                if (state[MODULE_ID].attemptsRemaining > 0) {
+                    showQuizFeedback(`⚠️ Algunas respuestas son incorrectas. Te quedan ${state[MODULE_ID].attemptsRemaining} intentos.`, '#fee2e2', '#b91c1c');
+                } else {
+                    showQuizFeedback('❌ No quedan intentos. Usa el botón Reiniciar módulo para volver a intentarlo.', '#fee2e2', '#b91c1c');
+                }
+            }
+            applyQuizFeedback();
+            updateQuizUI();
+        }
+
+        function resetModule() {
+            const state = getState();
+            state[MODULE_ID].attemptsRemaining = MAX_ATTEMPTS;
+            state[MODULE_ID].answers = {};
+            state[MODULE_ID].tests[0] = false;
+            state[MODULE_ID].exercises = EXERCISES.map(() => false);
+            saveProgress(state);
+            document.querySelectorAll('.option-label').forEach(label => label.classList.remove('selected-option', 'option-correct', 'option-wrong'));
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            renderProgress();
+            updateQuizUI();
+        }
+
+        function markTheoryRead() {
+            const state = getState();
+            state[MODULE_ID].exercises[0] = true;
+            saveProgress(state);
+            renderProgress();
+        }
+
+        function updateNetworkRisk(markExercise = false) {
+            const preview = document.getElementById('network-risk');
+            const choice = document.getElementById('network-select').value;
+            let html = '';
+            if (choice === 'home') {
+                html = '<strong>Wi-Fi de casa</strong><p>Riesgo bajo si usas cifrado WPA2/WPA3 y contraseña segura.</p>';
+            } else if (choice === 'cafe') {
+                html = '<strong>Wi-Fi de cafetería</strong><p>Riesgo moderado: otros usuarios pueden observar tu tráfico. Usa VPN para protegerte.</p>';
+            } else if (choice === 'vpn') {
+                html = '<strong>VPN activada</strong><p>Riesgo bajo: tus datos viajan cifrados, incluso en redes inseguras.</p>';
+            } else {
+                html = '<strong>Red pública abierta</strong><p>Riesgo alto: cualquier persona puede interceptar tus datos. No ingreses contraseñas ni información sensible.</p>';
+            }
+            preview.innerHTML = html;
+            if (markExercise) {
+                const state = getState();
+                state[MODULE_ID].exercises[1] = true;
+                saveProgress(state);
+                renderProgress();
+            }
+        }
+
+        function markNetworkSafe() {
+            const state = getState();
+            state[MODULE_ID].exercises[2] = true;
+            saveProgress(state);
+            renderProgress();
+            alert('Has simulado la protección con VPN. ¡Buena práctica!');
+        }
+
+        function evaluateNetworkScenario(choice) {
+            const feedback = document.getElementById('network-scenario-feedback');
+            const state = getState();
+            if (choice === 'vpn' || choice === 'off') {
+                feedback.classList.remove('hidden');
+                feedback.innerText = '✅ Buena decisión: proteger tus datos con VPN o datos móviles es más seguro.';
+                feedback.style.background = '#dcfce7';
+                feedback.style.color = '#15803d';
+                state[MODULE_ID].exercises[3] = true;
+            } else {
+                feedback.classList.remove('hidden');
+                feedback.innerText = '⚠️ En una red pública abierta es mejor no enviar datos sensibles sin protección.';
+                feedback.style.background = '#fde68a';
+                feedback.style.color = '#92400e';
+                state[MODULE_ID].exercises[3] = true;
+            }
+            saveProgress(state);
+            renderProgress();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNetworkRisk();
+            document.getElementById('mark-theory').addEventListener('click', markTheoryRead);
+            document.getElementById('validate-quiz').addEventListener('click', validateQuiz);
+            renderProgress();
+        });
+    </script>
+</body>
+</html>
